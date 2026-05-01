@@ -1,0 +1,2 @@
+# sunrice-au-static
+
