@@ -82,31 +82,28 @@ function updateIngredients(root, servings) {
   });
 }
 
+const SERVING_OPTIONS = [1, 2, 4, 6, 8];
+
 document.querySelectorAll('[data-base-servings]').forEach((root) => {
-  const output = root.querySelector('[data-current-servings]');
-  const range = root.querySelector('[data-servings-range]');
-  const decrease = root.querySelector('[data-servings-decrease]');
-  const increase = root.querySelector('[data-servings-increase]');
-  let servings = Math.max(1, Number(root.dataset.baseServings || 1));
+  const picker = root.querySelector('[data-servings-picker]');
+  const base = Math.max(1, Number(root.dataset.baseServings || 2));
+  let servings = SERVING_OPTIONS.reduce((prev, curr) =>
+    Math.abs(curr - base) < Math.abs(prev - base) ? curr : prev
+  );
 
   const render = () => {
-    if (output) output.textContent = String(servings);
-    if (range && Number(range.value) !== servings) range.value = String(servings);
+    picker?.querySelectorAll('[data-servings-value]').forEach(btn => {
+      const active = Number(btn.dataset.servingsValue) === servings;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
     updateIngredients(root, servings);
   };
 
-  range?.addEventListener('input', () => {
-    servings = Math.max(1, Number(range.value || 1));
-    render();
-  });
-
-  decrease?.addEventListener('click', () => {
-    servings = Math.max(1, servings - 1);
-    render();
-  });
-
-  increase?.addEventListener('click', () => {
-    servings += 1;
+  picker?.addEventListener('click', e => {
+    const btn = e.target.closest('[data-servings-value]');
+    if (!btn) return;
+    servings = Number(btn.dataset.servingsValue);
     render();
   });
 
