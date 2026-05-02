@@ -4661,6 +4661,25 @@ h3 {
     }
 }
 
+.bg-brand {
+    background-color: var(--brand, #bc2c13);
+    color: #fff;
+}
+
+.builder-block--fullWidthImage {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+    padding: 0;
+    line-height: 0;
+}
+
+.builder-block--fullWidthImage picture,
+.builder-block--fullWidthImage img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
 .align-centre {
     text-align: center;
 }
