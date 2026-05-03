@@ -1,6 +1,7 @@
-const GAP = 20;          // px gap between slides
-const PEEK_RATIO = 0.11; // 11% of container shown on each side (~matches sunrice.com.au)
-const DURATION = 500;    // ms slide transition
+const GAP = 20;              // px gap between slides (desktop)
+const PEEK_RATIO = 0.11;     // 11% of container shown on each side (~matches sunrice.com.au)
+const MOBILE_BP = 640;       // px — below this: full-width, no peek, no gap
+const DURATION = 500;        // ms slide transition
 const EASING = 'cubic-bezier(0.4, 0, 0.2, 1)';
 const AUTO_DELAY = 5000;
 
@@ -83,17 +84,26 @@ class ImageSlider {
 
   // ─── Sizing ────────────────────────────────────────────────────────────────
 
+  isMobile() {
+    return window.innerWidth <= MOBILE_BP;
+  }
+
   peek() {
-    return Math.round(this.el.offsetWidth * PEEK_RATIO);
+    return this.isMobile() ? 0 : Math.round(this.el.offsetWidth * PEEK_RATIO);
+  }
+
+  gap() {
+    return this.isMobile() ? 0 : GAP;
   }
 
   slideWidth() {
-    // containerWidth = peek + slide + GAP + peek  →  slide = container - 2*peek - GAP
-    return Math.max(100, this.el.offsetWidth - 2 * this.peek() - GAP);
+    // containerWidth = peek + slide + gap + peek  →  slide = container - 2*peek - gap
+    return Math.max(100, this.el.offsetWidth - 2 * this.peek() - this.gap());
   }
 
   resize(reposition = true) {
     const sw = this.slideWidth();
+    this.track.style.gap = this.gap() + 'px';
     this.allSlides.forEach(s => { s.style.width = sw + 'px'; });
     if (reposition) this.moveTo(this.domIdx, false);
   }
@@ -102,8 +112,7 @@ class ImageSlider {
 
   translateXFor(di) {
     const sw = this.slideWidth();
-    // slide at di should start at this.peek() from container left
-    return this.peek() - di * (sw + GAP);
+    return this.peek() - di * (sw + this.gap());
   }
 
   moveTo(di, animate = true) {
